@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+
+<html lang="sv"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Farozoner AB</title>
+<meta name="description" content="Adminpanel för förvaltare hos Farozoner AB.">
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F4F1EC;
+    --bg-warm: #EDE8DF;
+    --bg-card: #FFFFFF;
+    --bg-sidebar: #1C2024;
+    --bg-sidebar-hover: #2A2F35;
+    --ink: #1C2024;
+    --ink-soft: #4A4F55;
+    --ink-muted: #7A8087;
+    --accent: #8B5A3C;
+    --accent-deep: #6B4429;
+    --accent-soft: #E8DDD0;
+    --line: rgba(28, 32, 36, 0.08);
+    --line-strong: rgba(28, 32, 36, 0.16);
+    --error: #B84A3B;
+    --error-soft: #FCE9E5;
+    --success: #4A7C59;
+    --success-soft: #E8F0EA;
+    --warning: #C28840;
+    --warning-soft: #FCF4E5;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  button { font-family: var(--sans); cursor: pointer; border: none; background: none; }
+
+  /* ====== LAYOUT ====== */
+  .app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ====== SIDEBAR ====== */
+  .sidebar {
+    background: var(--bg-sidebar);
+    color: rgba(255,255,255,0.7);
+    padding: 28px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 24px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 2px;
+  }
+  .logo-text {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 500;
+    color: white;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .logo-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 3px;
+  }
+  .sidebar-nav {
+    flex: 1;
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidebar-section {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.35);
+    padding: 16px 12px 8px;
+    font-weight: 500;
+  }
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    transition: all 0.15s;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-weight: 500;
+  }
+  .sidebar-link:hover {
+    background: var(--bg-sidebar-hover);
+    color: white;
+  }
+  .sidebar-link.active {
+    background: var(--accent);
+    color: white;
+  }
+  .sidebar-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .sidebar-link-badge {
+    margin-left: auto;
+    background: var(--error);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+  }
+  .sidebar-link.active .sidebar-link-badge {
+    background: rgba(255,255,255,0.25);
+  }
+  .sidebar-user {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    background: var(--accent-soft);
+    color: var(--accent-deep);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .user-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .user-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .user-role {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+  }
+  .user-logout {
+    color: rgba(255,255,255,0.4);
+    transition: color 0.15s;
+  }
+  .user-logout:hover { color: white; }
+  .user-logout svg { width: 14px; height: 14px; }
+
+  /* ====== MAIN ====== */
+  .main {
+    overflow-y: auto;
+  }
+  .topbar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--line);
+    padding: 18px 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .topbar-meta {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+  .topbar-meta a {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .topbar-meta a:hover { text-decoration: underline; }
+
+  .content {
+    padding: 32px 36px;
+    max-width: 1400px;
+  }
+
+  /* ====== DASHBOARD ====== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--bg-card);
+    padding: 22px 24px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    transition: all 0.2s;
+  }
+  .stat-card:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-1px);
+  }
+  .stat-card-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .stat-card-label span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  .stat-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .stat-icon svg { width: 16px; height: 16px; }
+  .stat-icon.icon-new { background: var(--error-soft); color: var(--error); }
+  .stat-icon.icon-pending { background: var(--warning-soft); color: var(--warning); }
+  .stat-icon.icon-done { background: var(--success-soft); color: var(--success); }
+  .stat-icon.icon-time { background: var(--accent-soft); color: var(--accent-deep); }
+
+  .stat-value {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .stat-trend {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 8px;
+  }
+  .stat-trend strong {
+    color: var(--success);
+    font-weight: 600;
+  }
+  .stat-trend.up strong { color: var(--success); }
+  .stat-trend.down strong { color: var(--error); }
+
+  /* ====== TOOLBAR ====== */
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .filter-pill {
+    padding: 7px 14px;
+    border: 1px solid var(--line-strong);
+    background: var(--bg-card);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    transition: all 0.15s;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filter-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .filter-pill.active {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+  .filter-pill .count {
+    background: rgba(0,0,0,0.06);
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .filter-pill.active .count {
+    background: rgba(255,255,255,0.2);
+  }
+
+  .search-box {
+    position: relative;
+    min-width: 240px;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 9px 14px 9px 36px;
+    border: 1px solid var(--line-strong);
+    background: var(--bg-card);
+    border-radius: 100px;
+    font-size: 13px;
+    font-family: var(--sans);
+    transition: all 0.15s;
+  }
+  .search-box input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.08);
+  }
+  .search-box svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    color: var(--ink-muted);
+  }
+
+  /* ====== TICKET LIST ====== */
+  .ticket-list {
+    background: var(--bg-card);
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .ticket-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 140px 110px 130px 110px;
+    gap: 16px;
+    padding: 16px 20px;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .ticket-row:last-child { border-bottom: none; }
+  .ticket-row:hover { background: var(--bg-warm); }
+
+  .ticket-row.row-header {
+    background: var(--bg-warm);
+    cursor: default;
+    padding: 12px 20px;
+  }
+  .ticket-row.row-header:hover { background: var(--bg-warm); }
+  .ticket-row.row-header > div {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .ticket-id {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent);
+  }
+  .ticket-main {
+    min-width: 0;
+  }
+  .ticket-subject {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ticket-tenant {
+    font-size: 12px;
+    color: var(--ink-muted);
+    display: flex;
+    gap: 10px;
+  }
+  .ticket-tenant svg {
+    width: 12px;
+    height: 12px;
+    vertical-align: -1px;
+    margin-right: 3px;
+  }
+  .ticket-category {
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--bg-warm);
+    border-radius: 100px;
+    width: fit-content;
+  }
+  .urgency-pill {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 100px;
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .urgency-pill::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .urgency-low { background: var(--success-soft); color: var(--success); }
+  .urgency-medium { background: var(--warning-soft); color: var(--warning); }
+  .urgency-high { background: var(--error-soft); color: var(--error); }
+
+  .status-pill {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 100px;
+    width: fit-content;
+  }
+  .status-new { background: var(--error-soft); color: var(--error); }
+  .status-pending { background: var(--warning-soft); color: var(--warning); }
+  .status-progress { background: rgba(74,124,89,0.15); color: var(--success); }
+  .status-done { background: var(--bg-warm); color: var(--ink-muted); }
+
+  .ticket-time {
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+  .ticket-time-relative {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ====== DETAIL MODAL ====== */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 32, 36, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+  }
+  .modal-backdrop.visible {
+    display: flex;
+    animation: fadeIn 0.2s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .modal {
+    background: var(--bg-card);
+    border-radius: 4px;
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-head {
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .modal-title-block {
+    flex: 1;
+  }
+  .modal-id {
+    font-family: var(--serif);
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .modal-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  .modal-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: var(--ink-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    background: var(--bg-warm);
+  }
+  .modal-close:hover {
+    background: var(--ink);
+    color: white;
+  }
+  .modal-close svg { width: 14px; height: 14px; }
+
+  .modal-body {
+    padding: 24px 28px;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 24px;
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+  }
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .info-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  .info-value {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .info-value a {
+    color: var(--accent);
+    border-bottom: 1px solid currentColor;
+  }
+  .info-value.full { grid-column: 1 / -1; }
+  .info-value-block {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    background: var(--bg-warm);
+    padding: 14px 16px;
+    border-radius: 3px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .images-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .image-thumb {
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, #d4c8b5, #a89478);
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .image-thumb:hover { transform: scale(1.03); }
+  .image-thumb::after {
+    content: '🏠';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    opacity: 0.3;
+  }
+
+  .actions-block {
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .actions-block h3 {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .action-row.single { grid-template-columns: 1fr; }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field-group label {
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  .field-group select,
+  .field-group input,
+  .field-group textarea {
+    padding: 9px 12px;
+    border: 1px solid var(--line-strong);
+    background: var(--bg);
+    border-radius: 3px;
+    font-size: 13px;
+    font-family: var(--sans);
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+  .field-group select:focus,
+  .field-group input:focus,
+  .field-group textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.08);
+  }
+  .field-group textarea {
+    min-height: 70px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  .modal-footer {
+    padding: 20px 28px;
+    background: var(--bg-warm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .footer-left {
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+  .btn {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 3px;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--sans);
+  }
+  .btn svg { width: 14px; height: 14px; }
+  .btn-secondary {
+    background: var(--bg-card);
+    color: var(--ink-soft);
+    border: 1px solid var(--line-strong);
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: white;
+  }
+  .btn-primary:hover {
+    background: var(--accent);
+  }
+
+  /* ====== TIMELINE ====== */
+  .timeline {
+    margin-top: 24px;
+  }
+  .timeline-title {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .timeline-item {
+    display: flex;
+    gap: 14px;
+    padding-bottom: 16px;
+    position: relative;
+  }
+  .timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 22px;
+    bottom: -4px;
+    width: 1px;
+    background: var(--line-strong);
+  }
+  .timeline-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg-card);
+    flex-shrink: 0;
+    margin-top: 2px;
+    position: relative;
+    z-index: 1;
+  }
+  .timeline-dot.muted {
+    border-color: var(--line-strong);
+  }
+  .timeline-content {
+    flex: 1;
+  }
+  .timeline-text {
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .timeline-text strong { font-weight: 600; }
+  .timeline-time {
+    font-size: 11px;
+    color: var(--ink-muted);
+  }
+
+  /* ====== EMPTY STATE ====== */
+  .empty {
+    padding: 64px 32px;
+    text-align: center;
+    color: var(--ink-muted);
+  }
+  .empty-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--bg-warm);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .empty-icon svg { width: 28px; height: 28px; color: var(--ink-muted); }
+  .empty-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .empty-text {
+    font-size: 14px;
+  }
+
+  /* ====== RESPONSIVE ====== */
+  @media (max-width: 960px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { 
+      position: relative;
+      height: auto;
+      flex-direction: row;
+      padding: 12px;
+      align-items: center;
+    }
+    .sidebar-logo { padding: 0 12px; border: none; }
+    .sidebar-nav, .sidebar-user { display: none; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .ticket-row { grid-template-columns: 1fr; gap: 8px; padding: 16px; }
+    .ticket-row.row-header { display: none; }
+    .content { padding: 20px; }
+    .topbar { padding: 14px 20px; }
+    .info-grid { grid-template-columns: 1fr; }
+    .modal-backdrop { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">F</div>
+      <div>
+        <div class="logo-text">Farozoner</div>
+        <div class="logo-sub">Adminpanel</div>
+      </div>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <button class="sidebar-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+        Översikt
+      </button>
+      
+      <div class="sidebar-section">Förvaltning</div>
+      
+      <button class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
+        Felanmälningar
+        <span class="sidebar-link-badge">7</span>
+      </button>
+      
+      <button class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9,22 9,12 15,12 15,22"></polyline></svg>
+        Fastigheter
+      </button>
+      
+      <button class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><path d="M20 8v6M23 11h-6"></path></svg>
+        Hyresgäster
+      </button>
+      
+      <button class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"></path></svg>
+        Hantverkare
+      </button>
+      
+      <div class="sidebar-section">System</div>
+      
+      <button class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+        Statistik
+      </button>
+      
+      <button class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+        Inställningar
+      </button>
+    </nav>
+    
+    <div class="sidebar-user">
+      <div class="user-avatar">JF</div>
+      <div class="user-info">
+        <div class="user-name">Johan Faroz</div>
+        <div class="user-role">Förvaltare</div>
+      </div>
+      <button class="user-logout" title="Logga ut">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"></path></svg>
+      </button>
+    </div>
+  </aside>
+  
+  <!-- MAIN -->
+  <main class="main">
+    
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title">Felanmälningar</div>
+      <div class="topbar-meta">
+        <span>Idag: <strong id="today-date">onsdag 29 april</strong></span>
+        <a href="index.html">↗ Visa hemsidan</a>
+      </div>
+    </div>
+    
+    <div class="content">
+      
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <span>Nya idag</span>
+            <div class="stat-icon icon-new">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+          </div>
+          <div class="stat-value">3</div>
+          <div class="stat-trend down">2 av dem är akuta</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <span>Pågående</span>
+            <div class="stat-icon icon-pending">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg>
+            </div>
+          </div>
+          <div class="stat-value">7</div>
+          <div class="stat-trend">Hantverkare tilldelad</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <span>Klara denna vecka</span>
+            <div class="stat-icon icon-done">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"></polyline></svg>
+            </div>
+          </div>
+          <div class="stat-value">14</div>
+          <div class="stat-trend up"><strong>+22%</strong> mot förra veckan</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <span>Genomsnittlig svarstid</span>
+            <div class="stat-icon icon-time">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg>
+            </div>
+          </div>
+          <div class="stat-value">4.2<span style="font-size: 18px; font-style: italic; color: var(--accent);">h</span></div>
+          <div class="stat-trend up"><strong>1.2h snabbare</strong> än målet</div>
+        </div>
+      </div>
+      
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <div class="filters">
+          <button class="filter-pill active" data-filter="all">Alla <span class="count">10</span></button>
+          <button class="filter-pill" data-filter="new">Nya <span class="count">3</span></button>
+          <button class="filter-pill" data-filter="progress">Pågående <span class="count">5</span></button>
+          <button class="filter-pill" data-filter="pending">Väntar <span class="count">2</span></button>
+          <button class="filter-pill" data-filter="high">Endast akuta</button>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" placeholder="Sök ärende, adress, hyresgäst..." id="search-input">
+        </div>
+      </div>
+      
+      <!-- TICKET LIST -->
+      <div class="ticket-list" id="ticket-list"><div class="ticket-row row-header">
+          <div>Ärende</div>
+          <div>Beskrivning</div>
+          <div>Kategori</div>
+          <div>Brådska</div>
+          <div>Status</div>
+          <div>Mottaget</div>
+        </div><div class="ticket-row">
+        <div class="ticket-id">#0142</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">Vattenläcka under handfat i badrum</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Anna Lindqvist</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>Östervångsvägen 14, Landskrona</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">🚿 Badrum</span></div>
+        <div><span class="urgency-pill urgency-high">Hög</span></div>
+        <div><span class="status-pill status-new">Ny</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">2 tim sedan</span></div>
+      </div><div class="ticket-row">
+        <div class="ticket-id">#0141</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">Diskmaskinen läcker — vatten på golvet</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Erik Magnusson</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>Kungsgatan 22, Landskrona</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">🍳 Kök</span></div>
+        <div><span class="urgency-pill urgency-high">Hög</span></div>
+        <div><span class="status-pill status-new">Ny</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">3 tim sedan</span></div>
+      </div><div class="ticket-row">
+        <div class="ticket-id">#0140</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">Element kallt i sovrummet</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Sara Bengtsson</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>Strandvägen 7, Glumslöv</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">⚡ El &amp; VVS</span></div>
+        <div><span class="urgency-pill urgency-medium">Medel</span></div>
+        <div><span class="status-pill status-new">Ny</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">4 tim sedan</span></div>
+      </div><div class="ticket-row">
+        <div class="ticket-id">#0139</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">Toalettstol spolar inte</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Mikael Persson</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>Rådhustorget 4, Landskrona</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">🚿 Badrum</span></div>
+        <div><span class="urgency-pill urgency-high">Hög</span></div>
+        <div><span class="status-pill status-progress">Pågående</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">Igår</span></div>
+      </div><div class="ticket-row">
+        <div class="ticket-id">#0138</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">Trasig spis — en av plattorna fungerar inte</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Lisa Karlsson</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>Gamla Kyrkogatan 6, Landskrona</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">🍳 Kök</span></div>
+        <div><span class="urgency-pill urgency-medium">Medel</span></div>
+        <div><span class="status-pill status-progress">Pågående</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">Igår</span></div>
+      </div><div class="ticket-row">
+        <div class="ticket-id">#0137</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">Dörrlås till lägenhet kärvar</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>David Olsson</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>Storgatan 29, Landskrona</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">🔧 Övrigt</span></div>
+        <div><span class="urgency-pill urgency-medium">Medel</span></div>
+        <div><span class="status-pill status-progress">Pågående</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">Igår</span></div>
+      </div><div class="ticket-row">
+        <div class="ticket-id">#0136</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">Lampa i hall lyser inte</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Emma Andersson</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>Larvigatan 16, Landskrona</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">⚡ El &amp; VVS</span></div>
+        <div><span class="urgency-pill urgency-low">Låg</span></div>
+        <div><span class="status-pill status-progress">Pågående</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">2 dagar sedan</span></div>
+      </div><div class="ticket-row">
+        <div class="ticket-id">#0135</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">Fönsterhasp lös i vardagsrum</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Per Eriksson</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>Gamla Kyrkogatan 2, Landskrona</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">🔧 Övrigt</span></div>
+        <div><span class="urgency-pill urgency-low">Låg</span></div>
+        <div><span class="status-pill status-pending">Väntar</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">2 dagar sedan</span></div>
+      </div><div class="ticket-row">
+        <div class="ticket-id">#0134</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">Dålig ventilation i badrum</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Jonas Larsson</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>Suellsgatan 17, Landskrona</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">🚿 Badrum</span></div>
+        <div><span class="urgency-pill urgency-low">Låg</span></div>
+        <div><span class="status-pill status-pending">Väntar</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">3 dagar sedan</span></div>
+      </div><div class="ticket-row">
+        <div class="ticket-id">#0133</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">Skada på fasad efter storm</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Hyresgästförening</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>Bangårdsgatan 3, Landskrona</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">🔧 Övrigt</span></div>
+        <div><span class="urgency-pill urgency-medium">Medel</span></div>
+        <div><span class="status-pill status-progress">Pågående</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">3 dagar sedan</span></div>
+      </div></div>
+      
+    </div>
+  </main>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" id="modal">
+    <!-- Content injected by JS -->
+  </div>
+</div>
+
+<script>
+  // ============== MOCK DATA ==============
+  const tickets = [
+    {
+      id: 'FZ-2026-0142',
+      subject: 'Vattenläcka under handfat i badrum',
+      tenant: 'Anna Lindqvist',
+      phone: '070-123 45 67',
+      email: 'anna.lindqvist@example.se',
+      apartment: '1203',
+      address: 'Östervångsvägen 14, Landskrona',
+      category: 'Badrum',
+      subcategory: 'Vatten / läckage',
+      urgency: 'high',
+      status: 'new',
+      received: '2026-04-29 09:14',
+      receivedRelative: '2 tim sedan',
+      description: 'Det droppar från taket under handfatet i badrummet. Märkte det i morse, en pöl på golvet ungefär en deciliter. Vattnet rinner kontinuerligt och jag har ställt en hink under för att fånga upp det.',
+      access: 'Ja, med huvudnyckel',
+      images: 3,
+      timeline: [
+        { time: '2026-04-29 09:14', text: '<strong>Anmälan mottagen</strong> via formulär', dot: true },
+        { time: '2026-04-29 09:15', text: 'Bekräftelse skickad till hyresgäst', dot: true }
+      ]
+    },
+    {
+      id: 'FZ-2026-0141',
+      subject: 'Diskmaskinen läcker — vatten på golvet',
+      tenant: 'Erik Magnusson',
+      phone: '070-234 56 78',
+      email: 'erik.m@example.se',
+      apartment: '0405',
+      address: 'Kungsgatan 22, Landskrona',
+      category: 'Kök',
+      subcategory: 'Vitvaror',
+      urgency: 'high',
+      status: 'new',
+      received: '2026-04-29 08:42',
+      receivedRelative: '3 tim sedan',
+      description: 'Diskmaskinen har börjat läcka vatten under maskinen. Det är inte mycket men kontinuerligt. Stängde av den men behöver hjälp.',
+      access: 'Nej, kontakta mig först',
+      images: 1,
+      timeline: [
+        { time: '2026-04-29 08:42', text: '<strong>Anmälan mottagen</strong>', dot: true }
+      ]
+    },
+    {
+      id: 'FZ-2026-0140',
+      subject: 'Element kallt i sovrummet',
+      tenant: 'Sara Bengtsson',
+      phone: '070-345 67 89',
+      email: 'sara.b@example.se',
+      apartment: '0302',
+      address: 'Strandvägen 7, Glumslöv',
+      category: 'El & VVS',
+      subcategory: 'Värme / element',
+      urgency: 'medium',
+      status: 'new',
+      received: '2026-04-29 07:55',
+      receivedRelative: '4 tim sedan',
+      description: 'Elementet i sovrummet blir inte varmt. Andra elementen i lägenheten fungerar normalt.',
+      access: 'Ja, med huvudnyckel',
+      images: 0,
+      timeline: [
+        { time: '2026-04-29 07:55', text: '<strong>Anmälan mottagen</strong>', dot: true }
+      ]
+    },
+    {
+      id: 'FZ-2026-0139',
+      subject: 'Toalettstol spolar inte',
+      tenant: 'Mikael Persson',
+      phone: '070-456 78 90',
+      email: 'mikael.p@example.se',
+      apartment: '0107',
+      address: 'Rådhustorget 4, Landskrona',
+      category: 'Badrum',
+      subcategory: 'Avlopp / stopp',
+      urgency: 'high',
+      status: 'progress',
+      received: '2026-04-28 16:20',
+      receivedRelative: 'Igår',
+      description: 'Toalettstolen spolar inte alls. Vatten kommer inte ner. Behöver akut hjälp då vi har gäster ikväll.',
+      access: 'Ja, med huvudnyckel',
+      images: 0,
+      assigned: 'Lars Svensson, Rörjouren AB',
+      scheduled: '2026-04-29 13:00',
+      timeline: [
+        { time: '2026-04-28 16:20', text: '<strong>Anmälan mottagen</strong>', dot: true },
+        { time: '2026-04-28 16:45', text: 'Tilldelad till <strong>Lars Svensson, Rörjouren AB</strong>', dot: true },
+        { time: '2026-04-28 17:00', text: 'Bekräftelse till hyresgäst om besök 13:00 idag', dot: true }
+      ]
+    },
+    {
+      id: 'FZ-2026-0138',
+      subject: 'Trasig spis — en av plattorna fungerar inte',
+      tenant: 'Lisa Karlsson',
+      phone: '070-567 89 01',
+      email: 'lisa.k@example.se',
+      apartment: '0204',
+      address: 'Gamla Kyrkogatan 6, Landskrona',
+      category: 'Kök',
+      subcategory: 'Vitvaror',
+      urgency: 'medium',
+      status: 'progress',
+      received: '2026-04-28 14:10',
+      receivedRelative: 'Igår',
+      description: 'Den högra främre plattan på spisen fungerar inte längre. Inget händer när jag vrider på den.',
+      access: 'Ja, med huvudnyckel',
+      images: 1,
+      assigned: 'Kjell Nilsson, El-Service Skåne',
+      scheduled: '2026-04-30 09:00',
+      timeline: [
+        { time: '2026-04-28 14:10', text: '<strong>Anmälan mottagen</strong>', dot: true },
+        { time: '2026-04-28 14:30', text: 'Tilldelad till <strong>Kjell Nilsson, El-Service Skåne</strong>', dot: true },
+        { time: '2026-04-28 15:00', text: 'Tid bokad: 30 april kl 09:00', dot: true }
+      ]
+    },
+    {
+      id: 'FZ-2026-0137',
+      subject: 'Dörrlås till lägenhet kärvar',
+      tenant: 'David Olsson',
+      phone: '070-678 90 12',
+      email: 'david.o@example.se',
+      apartment: '0501',
+      address: 'Storgatan 29, Landskrona',
+      category: 'Övrigt',
+      subcategory: 'Dörr / lås',
+      urgency: 'medium',
+      status: 'progress',
+      received: '2026-04-28 11:30',
+      receivedRelative: 'Igår',
+      description: 'Det är svårt att vrida om nyckeln i lägenhetsdörren. Den kärvar och man måste lirka mycket.',
+      access: 'Nej, kontakta mig först',
+      images: 0,
+      assigned: 'Bengt Andersson, Lås & Säkerhet',
+      scheduled: '2026-04-30 14:00',
+      timeline: [
+        { time: '2026-04-28 11:30', text: '<strong>Anmälan mottagen</strong>', dot: true },
+        { time: '2026-04-28 13:00', text: 'Tilldelad till <strong>Bengt Andersson, Lås & Säkerhet</strong>', dot: true }
+      ]
+    },
+    {
+      id: 'FZ-2026-0136',
+      subject: 'Lampa i hall lyser inte',
+      tenant: 'Emma Andersson',
+      phone: '070-789 01 23',
+      email: 'emma.a@example.se',
+      apartment: '0103',
+      address: 'Larvigatan 16, Landskrona',
+      category: 'El & VVS',
+      subcategory: 'El / belysning',
+      urgency: 'low',
+      status: 'progress',
+      received: '2026-04-27 19:00',
+      receivedRelative: '2 dagar sedan',
+      description: 'Taklampan i hallen lyser inte trots att jag bytt glödlampa.',
+      access: 'Ja, med huvudnyckel',
+      images: 0,
+      assigned: 'Kjell Nilsson, El-Service Skåne',
+      scheduled: '2026-05-02 10:00',
+      timeline: [
+        { time: '2026-04-27 19:00', text: '<strong>Anmälan mottagen</strong>', dot: true },
+        { time: '2026-04-28 08:30', text: 'Tilldelad till <strong>Kjell Nilsson</strong>', dot: true }
+      ]
+    },
+    {
+      id: 'FZ-2026-0135',
+      subject: 'Fönsterhasp lös i vardagsrum',
+      tenant: 'Per Eriksson',
+      phone: '070-890 12 34',
+      email: 'per.e@example.se',
+      apartment: '0306',
+      address: 'Gamla Kyrkogatan 2, Landskrona',
+      category: 'Övrigt',
+      subcategory: 'Fönster',
+      urgency: 'low',
+      status: 'pending',
+      received: '2026-04-27 15:20',
+      receivedRelative: '2 dagar sedan',
+      description: 'Hasen som håller ihop ett av fönstren i vardagsrummet sitter löst. Det går att stänga men känns instabilt.',
+      access: 'Ja, med huvudnyckel',
+      images: 1,
+      timeline: [
+        { time: '2026-04-27 15:20', text: '<strong>Anmälan mottagen</strong>', dot: true },
+        { time: '2026-04-27 15:30', text: 'Väntar på tilldelning till hantverkare', dot: false }
+      ]
+    },
+    {
+      id: 'FZ-2026-0134',
+      subject: 'Dålig ventilation i badrum',
+      tenant: 'Jonas Larsson',
+      phone: '070-901 23 45',
+      email: 'jonas.l@example.se',
+      apartment: '0202',
+      address: 'Suellsgatan 17, Landskrona',
+      category: 'Badrum',
+      subcategory: 'Ventilation',
+      urgency: 'low',
+      status: 'pending',
+      received: '2026-04-26 10:00',
+      receivedRelative: '3 dagar sedan',
+      description: 'Det imar mycket i badrummet och tar lång tid att försvinna. Tror ventilationen behöver kollas.',
+      access: 'Ja, med huvudnyckel',
+      images: 0,
+      timeline: [
+        { time: '2026-04-26 10:00', text: '<strong>Anmälan mottagen</strong>', dot: true }
+      ]
+    },
+    {
+      id: 'FZ-2026-0133',
+      subject: 'Skada på fasad efter storm',
+      tenant: 'Hyresgästförening',
+      phone: '0418-123456',
+      email: 'styrelse@example.se',
+      apartment: 'Allmänt',
+      address: 'Bangårdsgatan 3, Landskrona',
+      category: 'Övrigt',
+      subcategory: 'Annat',
+      urgency: 'medium',
+      status: 'progress',
+      received: '2026-04-26 08:15',
+      receivedRelative: '3 dagar sedan',
+      description: 'Efter stormen igår har en bit puts lossnat från fasaden mot gatan. Inget akut men bör tas om hand innan mer faller ner.',
+      access: 'Inte tillämpligt (utvändigt)',
+      images: 2,
+      assigned: 'Byggservice Skåne',
+      scheduled: '2026-05-05',
+      timeline: [
+        { time: '2026-04-26 08:15', text: '<strong>Anmälan mottagen</strong>', dot: true },
+        { time: '2026-04-26 11:00', text: 'Inspektion utförd av <strong>Byggservice Skåne</strong>', dot: true },
+        { time: '2026-04-27 09:00', text: 'Reparation bokad till 5 maj', dot: true }
+      ]
+    }
+  ];
+
+  // ============== RENDER ==============
+  const labels = {
+    category: {
+      'Kök': '🍳',
+      'Badrum': '🚿',
+      'El & VVS': '⚡',
+      'Övrigt': '🔧'
+    },
+    urgency: {
+      low: 'Låg',
+      medium: 'Medel',
+      high: 'Hög'
+    },
+    status: {
+      new: 'Ny',
+      progress: 'Pågående',
+      pending: 'Väntar',
+      done: 'Klar'
+    }
+  };
+
+  function renderTickets(filter = 'all', search = '') {
+    const list = document.getElementById('ticket-list');
+    const header = list.querySelector('.row-header');
+    list.innerHTML = '';
+    list.appendChild(header);
+
+    let filtered = tickets;
+    if (filter === 'new') filtered = filtered.filter(t => t.status === 'new');
+    else if (filter === 'progress') filtered = filtered.filter(t => t.status === 'progress');
+    else if (filter === 'pending') filtered = filtered.filter(t => t.status === 'pending');
+    else if (filter === 'high') filtered = filtered.filter(t => t.urgency === 'high');
+
+    if (search) {
+      const s = search.toLowerCase();
+      filtered = filtered.filter(t => 
+        t.id.toLowerCase().includes(s) ||
+        t.subject.toLowerCase().includes(s) ||
+        t.tenant.toLowerCase().includes(s) ||
+        t.address.toLowerCase().includes(s)
+      );
+    }
+
+    if (filtered.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.innerHTML = `
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="empty-title">Inga ärenden matchar</div>
+        <div class="empty-text">Prova att ändra filter eller söktermer</div>
+      `;
+      list.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'ticket-row';
+      row.onclick = () => openModal(t);
+      row.innerHTML = `
+        <div class="ticket-id">${t.id.replace('FZ-2026-', '#')}</div>
+        <div class="ticket-main">
+          <div class="ticket-subject">${t.subject}</div>
+          <div class="ticket-tenant">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${t.tenant}</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>${t.address}</span>
+          </div>
+        </div>
+        <div><span class="ticket-category">${labels.category[t.category]} ${t.category}</span></div>
+        <div><span class="urgency-pill urgency-${t.urgency}">${labels.urgency[t.urgency]}</span></div>
+        <div><span class="status-pill status-${t.status}">${labels.status[t.status]}</span></div>
+        <div class="ticket-time"><span class="ticket-time-relative">${t.receivedRelative}</span></div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  // ============== MODAL ==============
+  function openModal(t) {
+    const modal = document.getElementById('modal');
+    
+    let imagesHTML = '';
+    if (t.images > 0) {
+      let thumbs = '';
+      for (let i = 0; i < t.images; i++) thumbs += '<div class="image-thumb"></div>';
+      imagesHTML = `
+        <div class="info-item full">
+          <div class="info-label">Bilagor (${t.images} bild${t.images > 1 ? 'er' : ''})</div>
+          <div class="images-row">${thumbs}</div>
+        </div>
+      `;
+    }
+
+    let assignedHTML = '';
+    if (t.assigned) {
+      assignedHTML = `
+        <div class="info-item">
+          <div class="info-label">Tilldelad hantverkare</div>
+          <div class="info-value">${t.assigned}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Bokat besök</div>
+          <div class="info-value">${t.scheduled}</div>
+        </div>
+      `;
+    }
+
+    let timelineHTML = '';
+    t.timeline.forEach(item => {
+      timelineHTML += `
+        <div class="timeline-item">
+          <div class="timeline-dot ${item.dot ? '' : 'muted'}"></div>
+          <div class="timeline-content">
+            <div class="timeline-text">${item.text}</div>
+            <div class="timeline-time">${item.time}</div>
+          </div>
+        </div>
+      `;
+    });
+
+    modal.innerHTML = `
+      <div class="modal-head">
+        <div class="modal-title-block">
+          <div class="modal-id">${t.id}</div>
+          <div class="modal-title">${t.subject}</div>
+          <div class="modal-meta">
+            <span class="urgency-pill urgency-${t.urgency}">${labels.urgency[t.urgency]} brådska</span>
+            <span class="status-pill status-${t.status}">${labels.status[t.status]}</span>
+            <span class="ticket-category">${labels.category[t.category]} ${t.category} — ${t.subcategory}</span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Hyresgäst</div>
+            <div class="info-value">${t.tenant}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Lägenhet / Lokal</div>
+            <div class="info-value">${t.apartment}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Telefon</div>
+            <div class="info-value"><a href="tel:${t.phone}">${t.phone}</a></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">E-post</div>
+            <div class="info-value"><a href="mailto:${t.email}">${t.email}</a></div>
+          </div>
+          <div class="info-item full">
+            <div class="info-label">Adress</div>
+            <div class="info-value">${t.address}</div>
+          </div>
+          <div class="info-item full">
+            <div class="info-label">Beskrivning</div>
+            <div class="info-value-block">${t.description}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Tillträde</div>
+            <div class="info-value">${t.access}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Mottaget</div>
+            <div class="info-value">${t.received}</div>
+          </div>
+          ${assignedHTML}
+          ${imagesHTML}
+        </div>
+        
+        <div class="actions-block">
+          <h3>Hantera ärende</h3>
+          <div class="action-row">
+            <div class="field-group">
+              <label>Ändra status</label>
+              <select>
+                <option ${t.status === 'new' ? 'selected' : ''}>Ny</option>
+                <option ${t.status === 'progress' ? 'selected' : ''}>Pågående</option>
+                <option ${t.status === 'pending' ? 'selected' : ''}>Väntar</option>
+                <option>Klar</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label>Tilldela hantverkare</label>
+              <select>
+                <option>Välj hantverkare...</option>
+                <option ${t.assigned && t.assigned.includes('Lars') ? 'selected' : ''}>Lars Svensson, Rörjouren AB</option>
+                <option ${t.assigned && t.assigned.includes('Kjell') ? 'selected' : ''}>Kjell Nilsson, El-Service Skåne</option>
+                <option ${t.assigned && t.assigned.includes('Bengt') ? 'selected' : ''}>Bengt Andersson, Lås & Säkerhet</option>
+                <option ${t.assigned && t.assigned.includes('Bygg') ? 'selected' : ''}>Byggservice Skåne</option>
+              </select>
+            </div>
+          </div>
+          <div class="action-row single">
+            <div class="field-group">
+              <label>Intern anteckning (syns inte för hyresgäst)</label>
+              <textarea placeholder="T.ex. 'Hyresgäst arbetar dagtid, ring innan 8:00 eller efter 17:00'"></textarea>
+            </div>
+          </div>
+        </div>
+        
+        <div class="timeline">
+          <div class="timeline-title">Historik</div>
+          ${timelineHTML}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="footer-left">Ärende ${t.id} • Senast uppdaterad ${t.received}</div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-secondary" onclick="closeModal()">Stäng</button>
+          <button class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>
+            Spara ändringar
+          </button>
+        </div>
+      </div>
+    `;
+    document.getElementById('modal-backdrop').classList.add('visible');
+  }
+
+  function closeModal() {
+    document.getElementById('modal-backdrop').classList.remove('visible');
+  }
+
+  document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+    if (e.target.id === 'modal-backdrop') closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // ============== FILTERS ==============
+  let currentFilter = 'all';
+  let currentSearch = '';
+
+  document.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentFilter = pill.dataset.filter;
+      renderTickets(currentFilter, currentSearch);
+    });
+  });
+
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    currentSearch = e.target.value;
+    renderTickets(currentFilter, currentSearch);
+  });
+
+  // ============== INIT ==============
+  const today = new Date('2026-04-29');
+  document.getElementById('today-date').textContent = today.toLocaleDateString('sv-SE', { 
+    weekday: 'long', day: 'numeric', month: 'long' 
+  });
+
+  renderTickets();
+</script>
+
+
+
+</body></html>
