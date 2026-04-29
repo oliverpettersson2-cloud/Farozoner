@@ -1414,56 +1414,35 @@
     const tilltradeLabel = ACCESS_LABELS[selectedAccess] || selectedAccess;
     const mottaget = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm' });
 
-    // Bygg det visuella meddelandet som Albin & Filip läser
-    // JSON-submission garanterar UTF-8 = svenska tecken funkar överallt
+    // Bygg meddelandet — tätt och skannbart
+    // Albin ska kunna kolla på mobilen i bilen och fatta läget direkt
+    const urgencyEmoji = { 'high': '🔴', 'medium': '🟡', 'low': '🟢' }[selectedUrgency] || '⚪';
+    const urgencyName = { 'high': 'AKUT', 'medium': 'SNART', 'low': 'NORMAL' }[selectedUrgency] || '';
+    const accessShort = selectedAccess === 'ja'
+      ? 'Får använda huvudnyckel'
+      : 'Kontakta hyresgästen för tid';
+
     const messageBody = [
-      '════════════════════════════════════════',
-      `   FELANMÄLAN  ·  ${ticketId}`,
-      '════════════════════════════════════════',
+      `${urgencyEmoji} ${urgencyName}  ·  ${ticketId}`,
+      `${kategoriLabel}  ·  ${underkategori}`,
       '',
-      `   ${bradskaLabel}`,
+      `📍 ${adress}, lgh ${lagenhet}`,
+      `👤 ${namn} · ${telefon}`,
+      `🔑 ${accessShort}`,
       '',
-      '────────────────────────────────────────',
       'PROBLEM',
-      '────────────────────────────────────────',
-      `Kategori:    ${kategoriLabel}`,
-      `Specifikt:   ${underkategori}`,
-      '',
-      'Beskrivning från hyresgästen:',
       `"${beskrivning}"`,
       '',
-      '────────────────────────────────────────',
-      'PLATS',
-      '────────────────────────────────────────',
-      `Adress:      ${adress}`,
-      `Lägenhet:    ${lagenhet}`,
-      '',
-      '────────────────────────────────────────',
-      'HYRESGÄST',
-      '────────────────────────────────────────',
-      `Namn:        ${namn}`,
-      `Telefon:     ${telefon}`,
-      `E-post:      ${epost}`,
-      '',
-      '────────────────────────────────────────',
-      'TILLTRÄDE',
-      '────────────────────────────────────────',
-      `${tilltradeLabel}`,
-      '',
-      '════════════════════════════════════════',
-      `Mottaget: ${mottaget}`,
-      `GDPR-samtycke: ✓ Godkänt vid inskickning`,
-      '════════════════════════════════════════',
-      '',
-      'Tips: Be hyresgästen SMSa bilder till Albin',
-      'på 0708-82 87 19 om bilder behövs för felet.'
+      '—',
+      `Mottaget ${mottaget} · GDPR ✓`,
+      `Svara på detta mejl så går svaret till ${epost}.`
     ].join('\n');
 
     // Bygg payload som JSON-objekt — Content-Type: application/json
     // garanterar UTF-8-kodning så å, ä, ö kommer fram rätt i mejlet
     const payload = {
       access_key: WEB3FORMS_ACCESS_KEY,
-      subject: `${bradskaTag} ${kategoriLabel} — ${adress}, lgh ${lagenhet}`,
+      subject: `${kategoriLabel} — ${urgencyEmoji} ${urgencyName} — ${adress}, lgh ${lagenhet}`,
       from_name: `Farozoner felanmälan`,
       replyto: epost,
       message: messageBody,
