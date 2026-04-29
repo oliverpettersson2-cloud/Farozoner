@@ -1330,15 +1330,15 @@
 
   // Mappar kategori-ID till läsbart namn för mejlet
   const CATEGORY_LABELS = {
-    'kok': 'Kok / koksapparater',
+    'kok': 'Kök / köksapparater',
     'badrum': 'Badrum / VVS',
-    'elvvs': 'El / VVS / varme',
-    'ovrigt': 'Ovrigt / allmant'
+    'elvvs': 'El / VVS / värme',
+    'ovrigt': 'Övrigt / allmänt'
   };
   const URGENCY_LABELS = {
-    'low': 'NORMAL — nar det passar inom 1-2 veckor',
-    'medium': 'SNART — bor atgardas inom nagra dagar',
-    'high': 'AKUT — paverkar boendet just nu'
+    'low': '🟢  NORMAL  —  åtgärdas inom 1–2 veckor',
+    'medium': '🟡  SNART  —  bör åtgärdas inom några dagar',
+    'high': '🔴  AKUT  —  påverkar boendet just nu'
   };
   const URGENCY_TAG = {
     'low': '[NORMAL]',
@@ -1346,8 +1346,8 @@
     'high': '[AKUT]'
   };
   const ACCESS_LABELS = {
-    'ja': 'Ja — hantverkare far anvanda huvudnyckel',
-    'nej': 'Nej — kontakta hyresgasten for tidsbokning'
+    'ja': 'Ja  —  hantverkare får använda huvudnyckel',
+    'nej': 'Nej  —  kontakta hyresgästen för tidsbokning'
   };
 
   document.getElementById('felanmalan-form').addEventListener('submit', async (e) => {
@@ -1414,76 +1414,86 @@
     const tilltradeLabel = ACCESS_LABELS[selectedAccess] || selectedAccess;
     const mottaget = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm' });
 
-    // Bygg det visuella meddelandet — det Albin & Filip läser
-    // (Använder mest ASCII för fältnamn så Web3Forms inte sabbar svenska tecken)
+    // Bygg det visuella meddelandet som Albin & Filip läser
+    // JSON-submission garanterar UTF-8 = svenska tecken funkar överallt
     const messageBody = [
-      '═══════════════════════════════════════',
-      `  FELANMÄLAN — ${ticketId}`,
-      '═══════════════════════════════════════',
+      '════════════════════════════════════════',
+      `   FELANMÄLAN  ·  ${ticketId}`,
+      '════════════════════════════════════════',
       '',
-      `${bradskaTag}  ${bradskaLabel}`,
+      `   ${bradskaLabel}`,
       '',
-      '─── PROBLEM ──────────────────────────',
-      `${kategoriLabel}`,
-      `${underkategori}`,
+      '────────────────────────────────────────',
+      'PROBLEM',
+      '────────────────────────────────────────',
+      `Kategori:    ${kategoriLabel}`,
+      `Specifikt:   ${underkategori}`,
       '',
+      'Beskrivning från hyresgästen:',
       `"${beskrivning}"`,
       '',
-      '─── PLATS ────────────────────────────',
-      `${adress}`,
-      `Lägenhet ${lagenhet}`,
+      '────────────────────────────────────────',
+      'PLATS',
+      '────────────────────────────────────────',
+      `Adress:      ${adress}`,
+      `Lägenhet:    ${lagenhet}`,
       '',
-      '─── HYRESGÄST ────────────────────────',
-      `${namn}`,
-      `Tel: ${telefon}`,
-      `E-post: ${epost}`,
+      '────────────────────────────────────────',
+      'HYRESGÄST',
+      '────────────────────────────────────────',
+      `Namn:        ${namn}`,
+      `Telefon:     ${telefon}`,
+      `E-post:      ${epost}`,
       '',
-      '─── TILLTRÄDE ────────────────────────',
+      '────────────────────────────────────────',
+      'TILLTRÄDE',
+      '────────────────────────────────────────',
       `${tilltradeLabel}`,
       '',
-      '═══════════════════════════════════════',
+      '════════════════════════════════════════',
       `Mottaget: ${mottaget}`,
-      `GDPR-samtycke: Ja, godkänt vid inskickning`,
-      `Ärendenummer: ${ticketId}`,
-      '═══════════════════════════════════════',
+      `GDPR-samtycke: ✓ Godkänt vid inskickning`,
+      '════════════════════════════════════════',
       '',
-      'Tips: Hyresgästen har uppmanats att SMSa bilder till',
-      'Albin (0708-82 87 19) om bilder behovs.'
+      'Tips: Be hyresgästen SMSa bilder till Albin',
+      'på 0708-82 87 19 om bilder behövs för felet.'
     ].join('\n');
 
-    // Bygg FormData
-    const fd = new FormData();
-    fd.append('access_key', WEB3FORMS_ACCESS_KEY);
-    fd.append('subject', `${bradskaTag} ${kategoriLabel} — ${adress}, lgh ${lagenhet}`);
-    fd.append('from_name', `Farozoner felanmalan (${ticketId})`);
+    // Bygg payload som JSON-objekt — Content-Type: application/json
+    // garanterar UTF-8-kodning så å, ä, ö kommer fram rätt i mejlet
+    const payload = {
+      access_key: WEB3FORMS_ACCESS_KEY,
+      subject: `${bradskaTag} ${kategoriLabel} — ${adress}, lgh ${lagenhet}`,
+      from_name: `Farozoner felanmälan`,
+      replyto: epost,
+      message: messageBody,
 
-    // Huvud-meddelandet (det Web3Forms visar som "Message" i mejlet)
-    fd.append('message', messageBody);
+      // Strukturerade fält (visas också i Web3Forms-dashboarden)
+      Ärendenummer: ticketId,
+      Hyresgäst: namn,
+      Telefon: telefon,
+      "E-post": epost,
+      Adress: adress,
+      Lägenhet: lagenhet,
+      Kategori: kategoriLabel,
+      Underkategori: underkategori,
+      Brådska: bradskaLabel,
+      Beskrivning: beskrivning,
+      Tillträde: tilltradeLabel,
+      Mottaget: mottaget,
 
-    // Replyto sätter så att Albin/Filip kan svara direkt till hyresgästen
-    fd.append('replyto', epost);
-
-    // Strukturerade fält (backup om någon vill söka i strukturerad data)
-    // Använd ASCII-keys för att undvika UTF-8-problem i Web3Forms
-    fd.append('Ticket', ticketId);
-    fd.append('Tenant', namn);
-    fd.append('Phone', telefon);
-    fd.append('Email', epost);
-    fd.append('Address', adress);
-    fd.append('Apartment', lagenhet);
-    fd.append('Category', kategoriLabel);
-    fd.append('Subcategory', underkategori);
-    fd.append('Urgency', bradskaLabel);
-    fd.append('Description', beskrivning);
-    fd.append('Access', tilltradeLabel);
-
-    // Honeypot mot spam (Web3Forms-konvention)
-    fd.append('botcheck', '');
+      // Honeypot mot spam (Web3Forms-konvention)
+      botcheck: ''
+    };
 
     try {
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        body: fd
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
 
