@@ -1110,7 +1110,7 @@
         <div class="field" style="margin-top: 20px;">
           <label class="field-label" for="beskrivning">Beskriv felet <span class="required">*</span></label>
           <textarea id="beskrivning" name="beskrivning" placeholder="T.ex. &#39;Det droppar från taket under handfatet i badrummet. Märkte det i morse, en pöl på golvet ungefär en deciliter…&#39;" required=""></textarea>
-          <div class="field-hint">Ju mer detaljerad beskrivning, desto snabbare kan vi åtgärda</div>
+          <div class="field-hint">Ju mer detaljerad beskrivning, desto snabbare kan vi åtgärda. Har du bilder? Skicka dem som SMS till Albin på <a href="sms:+46708828719" style="color: var(--ink); text-decoration: underline;">0708-82 87 19</a> efter att du skickat anmälan.</div>
           <div class="field-error">Beskriv felet kortfattat</div>
         </div>
       </div>
@@ -1141,31 +1141,10 @@
         </div>
       </div>
 
-      <!-- STEP 4: Bilder -->
+      <!-- STEP 4: Tillträde -->
       <div class="form-step">
         <div class="step-head">
           <div class="step-num">4</div>
-          <div>
-            <div class="step-title">Bifoga bilder <span style="font-weight: 400; color: var(--ink-muted); font-size: 14px;">(valfritt)</span></div>
-            <div class="step-sub">En bild säger mer än tusen ord — laddar du upp bilder löser vi felet snabbare</div>
-          </div>
-        </div>
-
-        <label class="upload-area" for="bilder">
-          <div class="upload-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path></svg>
-          </div>
-          <div class="upload-text"><strong>Klicka för att välja bilder</strong> eller dra hit dem</div>
-          <div class="upload-hint">JPG, PNG eller HEIC — max 10 MB per bild, max 5 bilder</div>
-        </label>
-        <input type="file" id="bilder" name="bilder" class="upload-input" accept="image/*" multiple="">
-        <div class="upload-previews" id="previews"></div>
-      </div>
-
-      <!-- STEP 5: Tillträde -->
-      <div class="form-step">
-        <div class="step-head">
-          <div class="step-num">5</div>
           <div>
             <div class="step-title">Får hantverkare gå in?</div>
             <div class="step-sub">Om du inte är hemma när hantverkaren kommer</div>
@@ -1340,39 +1319,6 @@
     });
   });
 
-  // Image upload preview
-  const uploadInput = document.getElementById('bilder');
-  const previewsEl = document.getElementById('previews');
-  let uploadedFiles = [];
-
-  uploadInput.addEventListener('change', (e) => {
-    const files = Array.from(e.target.files).slice(0, 5);
-    uploadedFiles = files;
-    renderPreviews();
-  });
-
-  function renderPreviews() {
-    previewsEl.innerHTML = '';
-    uploadedFiles.forEach((file, i) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const div = document.createElement('div');
-        div.className = 'preview';
-        div.innerHTML = `
-          <img src="${e.target.result}" alt="Bilaga">
-          <button type="button" class="preview-remove" onclick="removeFile(${i})">×</button>
-        `;
-        previewsEl.appendChild(div);
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function removeFile(index) {
-    uploadedFiles.splice(index, 1);
-    renderPreviews();
-  }
-
   // ============================================================
   // FORM SUBMIT — Web3Forms integration
   // ============================================================
@@ -1384,21 +1330,24 @@
 
   // Mappar kategori-ID till läsbart namn för mejlet
   const CATEGORY_LABELS = {
-    'vatten': 'Vatten / VVS',
-    'el': 'El / belysning',
-    'varme': 'Värme / ventilation',
-    'vitvaror': 'Vitvaror',
-    'lasoch': 'Lås / dörrar / fönster',
-    'allmant': 'Allmänt / övrigt'
+    'kok': 'Kok / koksapparater',
+    'badrum': 'Badrum / VVS',
+    'elvvs': 'El / VVS / varme',
+    'ovrigt': 'Ovrigt / allmant'
   };
   const URGENCY_LABELS = {
-    'akut': 'AKUT — påverkar boendet just nu',
-    'snart': 'Snart — bör åtgärdas inom några dagar',
-    'normal': 'Normal — när det passar inom 1-2 veckor'
+    'low': 'NORMAL — nar det passar inom 1-2 veckor',
+    'medium': 'SNART — bor atgardas inom nagra dagar',
+    'high': 'AKUT — paverkar boendet just nu'
+  };
+  const URGENCY_TAG = {
+    'low': '[NORMAL]',
+    'medium': '[SNART]',
+    'high': '[AKUT]'
   };
   const ACCESS_LABELS = {
-    'ja': 'Ja, hantverkare får använda huvudnyckel',
-    'nej': 'Nej, kontakta hyresgästen för tidsbokning'
+    'ja': 'Ja — hantverkare far anvanda huvudnyckel',
+    'nej': 'Nej — kontakta hyresgasten for tidsbokning'
   };
 
   document.getElementById('felanmalan-form').addEventListener('submit', async (e) => {
@@ -1451,42 +1400,82 @@
     btnSpinner.style.display = 'inline-block';
     errorBox.classList.remove('visible');
 
-    // Bygg FormData — Web3Forms vill ha multipart/form-data för filer
+    // Hämta alla värden
+    const namn = document.getElementById('namn').value;
+    const telefon = document.getElementById('telefon').value;
+    const epost = document.getElementById('epost').value;
+    const lagenhet = document.getElementById('lagenhet').value;
+    const adress = document.getElementById('adress').value;
+    const underkategori = document.getElementById('underkategori').value;
+    const beskrivning = document.getElementById('beskrivning').value;
+    const kategoriLabel = CATEGORY_LABELS[selectedCategory] || selectedCategory;
+    const bradskaLabel = URGENCY_LABELS[selectedUrgency] || selectedUrgency;
+    const bradskaTag = URGENCY_TAG[selectedUrgency] || '';
+    const tilltradeLabel = ACCESS_LABELS[selectedAccess] || selectedAccess;
+    const mottaget = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm' });
+
+    // Bygg det visuella meddelandet — det Albin & Filip läser
+    // (Använder mest ASCII för fältnamn så Web3Forms inte sabbar svenska tecken)
+    const messageBody = [
+      '═══════════════════════════════════════',
+      `  FELANMÄLAN — ${ticketId}`,
+      '═══════════════════════════════════════',
+      '',
+      `${bradskaTag}  ${bradskaLabel}`,
+      '',
+      '─── PROBLEM ──────────────────────────',
+      `${kategoriLabel}`,
+      `${underkategori}`,
+      '',
+      `"${beskrivning}"`,
+      '',
+      '─── PLATS ────────────────────────────',
+      `${adress}`,
+      `Lägenhet ${lagenhet}`,
+      '',
+      '─── HYRESGÄST ────────────────────────',
+      `${namn}`,
+      `Tel: ${telefon}`,
+      `E-post: ${epost}`,
+      '',
+      '─── TILLTRÄDE ────────────────────────',
+      `${tilltradeLabel}`,
+      '',
+      '═══════════════════════════════════════',
+      `Mottaget: ${mottaget}`,
+      `GDPR-samtycke: Ja, godkänt vid inskickning`,
+      `Ärendenummer: ${ticketId}`,
+      '═══════════════════════════════════════',
+      '',
+      'Tips: Hyresgästen har uppmanats att SMSa bilder till',
+      'Albin (0708-82 87 19) om bilder behovs.'
+    ].join('\n');
+
+    // Bygg FormData
     const fd = new FormData();
     fd.append('access_key', WEB3FORMS_ACCESS_KEY);
-    fd.append('subject', `[Felanmälan ${ticketId}] ${CATEGORY_LABELS[selectedCategory] || selectedCategory} — ${document.getElementById('adress').value}`);
-    fd.append('from_name', 'Farozoner felanmälan');
+    fd.append('subject', `${bradskaTag} ${kategoriLabel} — ${adress}, lgh ${lagenhet}`);
+    fd.append('from_name', `Farozoner felanmalan (${ticketId})`);
 
-    // Användardata
-    fd.append('Ärendenummer', ticketId);
-    fd.append('Mottaget', new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm' }));
-    fd.append('Namn', document.getElementById('namn').value);
-    fd.append('Telefon', document.getElementById('telefon').value);
-    fd.append('E-post', document.getElementById('epost').value);
-    fd.append('Lägenhet', document.getElementById('lagenhet').value);
-    fd.append('Adress', document.getElementById('adress').value);
-    fd.append('Kategori', CATEGORY_LABELS[selectedCategory] || selectedCategory);
-    fd.append('Underkategori', document.getElementById('underkategori').value);
-    fd.append('Brådska', URGENCY_LABELS[selectedUrgency] || selectedUrgency);
-    fd.append('Beskrivning', document.getElementById('beskrivning').value);
-    fd.append('Tillträde', ACCESS_LABELS[selectedAccess] || selectedAccess);
-    fd.append('GDPR-samtycke', 'Ja, godkänt vid inskickning');
+    // Huvud-meddelandet (det Web3Forms visar som "Message" i mejlet)
+    fd.append('message', messageBody);
 
-    // Bilder — Web3Forms tar attachments under namnet "attachment"
-    // Gratis-tier: max 5 MB totalt per submission
-    let totalSize = 0;
-    uploadedFiles.forEach((file, i) => {
-      totalSize += file.size;
-      fd.append(`attachment`, file, file.name);
-    });
-    if (totalSize > 5 * 1024 * 1024) {
-      submitBtn.disabled = false;
-      btnText.textContent = 'Skicka felanmälan';
-      btnArrow.style.display = 'inline-block';
-      btnSpinner.style.display = 'none';
-      alert('Bilderna är tillsammans större än 5 MB. Ta bort några och försök igen, eller skicka anmälan utan bilder så kontaktar vi dig för bilder separat.');
-      return;
-    }
+    // Replyto sätter så att Albin/Filip kan svara direkt till hyresgästen
+    fd.append('replyto', epost);
+
+    // Strukturerade fält (backup om någon vill söka i strukturerad data)
+    // Använd ASCII-keys för att undvika UTF-8-problem i Web3Forms
+    fd.append('Ticket', ticketId);
+    fd.append('Tenant', namn);
+    fd.append('Phone', telefon);
+    fd.append('Email', epost);
+    fd.append('Address', adress);
+    fd.append('Apartment', lagenhet);
+    fd.append('Category', kategoriLabel);
+    fd.append('Subcategory', underkategori);
+    fd.append('Urgency', bradskaLabel);
+    fd.append('Description', beskrivning);
+    fd.append('Access', tilltradeLabel);
 
     // Honeypot mot spam (Web3Forms-konvention)
     fd.append('botcheck', '');
@@ -1528,8 +1517,6 @@
     selectedCategory = null;
     selectedUrgency = null;
     selectedAccess = null;
-    uploadedFiles = [];
-    previewsEl.innerHTML = '';
     document.getElementById('submit-error').classList.remove('visible');
     // Återställ submit-knapp
     const submitBtn = document.getElementById('submit-btn');
